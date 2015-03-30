@@ -102,10 +102,18 @@ trait Implicits extends Types {
     Internal.validate("Array(n)"){case Js.Arr(x@_*) => f(x.map(readJs[T]))}
   )
 
-  implicit def OptionW[T: W]: W[Option[T]] = SeqLikeW[T, Option](x => Some(x.toSeq))
+  implicit def OptionW[T: W]: W[Option[T]] = W[Option[T]](_ match {
+    case Some(x) => writeJs(x)
+    case None => Js.Null
+    })
   implicit def SomeW[T: W] = W[Some[T]](OptionW[T].write)
   implicit def NoneW: W[None.type] = W[None.type](OptionW[Int].write)
-  implicit def OptionR[T: R]: R[Option[T]] = SeqLikeR[T, Option](_.headOption)
+  implicit def OptionR[T: R]: R[Option[T]] = R[Option[T]]{case x: Js.Value =>
+    x match {
+      case Js.Null => None
+      case x => Some(readJs[T](x))
+    }
+  }
   implicit def SomeR[T: R] = R[Some[T]](OptionR[T].read andThen (_.asInstanceOf[Some[T]]))
   implicit def NoneR: R[None.type] = R[None.type](OptionR[Int].read andThen (_.asInstanceOf[None.type]))
 
@@ -203,6 +211,9 @@ object Internal extends GeneratedInternal{
   def Case0W[T](t: T) = W[T](x => Js.Obj())
 
   def validate[T](name: String)(pf: PartialFunction[Js.Value, T]): PartialFunction[Js.Value, T] = {
-    pf.orElse { case x => throw Invalid.Data(x, name) }
+    pf.orElse {
+      case Js.Null => null.asInstanceOf[T]
+      case x => throw Invalid.Data(x, name)
+    }
   }
 }

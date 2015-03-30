@@ -199,7 +199,9 @@ object Macros {
     val defaults = argSyms.zipWithIndex.map { case (s, i) =>
       val defaultName = newTermName("apply$default$" + (i + 1))
       companion.tpe.member(defaultName) match{
-        case NoSymbol => q"null"
+        case NoSymbol =>
+          if (s.typeSignature.typeConstructor =:= typeOf[Option[_]].typeConstructor) q"upickle.Js.Null"
+          else q"null"
         case _ => q"upickle.writeJs($companion.$defaultName)"
       }
     }

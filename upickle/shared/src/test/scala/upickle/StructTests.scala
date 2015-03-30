@@ -79,11 +79,11 @@ object StructTests extends TestSuite{
     }
 
     'option{
-      'Some-rw(Some(123), "[123]")
-      'None-rw(None: Option[String], "[]")
+      'Some-rw(Some(123), "123")
+      'None-rw(None: Option[String], "null")
       'Option{
-        rw(Some(123): Option[Int], "[123]")
-        rw(None: Option[Int], "[]")
+        rw(Some(123): Option[Int], "123")
+        rw(None: Option[Int], "null")
       }
     }
 
@@ -107,12 +107,12 @@ object StructTests extends TestSuite{
     'combinations{
       'SeqListMapOptionString-rw[Seq[List[Map[Option[String], String]]]](
         Seq(Nil, List(Map(Some("omg") -> "omg"), Map(Some("lol") -> "lol", None -> "")), List(Map())),
-        """[[],[[[["omg"],"omg"]],[[["lol"],"lol"],[[],""]]],[[]]]"""
+        """[[],[[["omg","omg"]],[["lol","lol"],[null,""]]],[[]]]"""
       )
 
       'NullySeqListMapOptionString-rw[Seq[List[Map[Option[String], String]]]](
-        Seq(Nil, List(Map(Some(null) -> "omg"), Map(Some("lol") -> null, None -> "")), List(null)),
-        """[[],[[[[null],"omg"]],[[["lol"],null],[[],""]]],[null]]"""
+        Seq(Nil, List(Map(None -> "omg"), Map(Some("lol") -> null, None -> "")), List(null)),
+        """[[],[[[null,"omg"]],[["lol",null],[null,""]]],[null]]"""
       )
 
       'tuples-rw(
@@ -123,9 +123,9 @@ object StructTests extends TestSuite{
 
       'EitherDurationOptionDuration{
         rw(Left(10 seconds): Either[Duration, Int], """[0,"10000000000"]""")
-        rw(Right(Some(0.33 millis)): Either[Int, Option[Duration]], """[1,["330000"]]""")
+        rw(Right(Some(0.33 millis)): Either[Int, Option[Duration]], """[1,"330000"]""")
         rw(Left(10 seconds): Either[Duration, Option[Duration]], """[0,"10000000000"]""")
-        rw(Right(Some(0.33 millis)): Either[Duration, Option[Duration]], """[1,["330000"]]""")
+        rw(Right(Some(0.33 millis)): Either[Duration, Option[Duration]], """[1,"330000"]""")
       }
     }
 

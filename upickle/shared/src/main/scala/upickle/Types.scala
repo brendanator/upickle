@@ -39,9 +39,9 @@ object Writer{
 trait Reader[T]{
   def read0: PF[Js.Value, T]
 
-  final def read : PF[Js.Value, T] = ({
+  final def read : PF[Js.Value, T] = read0 orElse ({
     case Js.Null => null.asInstanceOf[T]
-  }: PF[Js.Value, T]) orElse read0
+  })
 }
 object Reader{
 

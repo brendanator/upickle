@@ -25,7 +25,7 @@ private[upickle] trait GeneratedUtil {
       }
       i += 1
     }
-    Js.Obj(accumulated.filter(_ != null):_*)
+    Js.Obj(accumulated.filter(_ != null).filter(_._2 != Js.Null):_*)
 
   }
   private[this] def mapToArray(o: Js.Obj, names: Array[String], defaults: Array[Js.Value]) = {
